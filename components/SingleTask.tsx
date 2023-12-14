@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { todoInterface } from "@/types/todo"
-import { updateMarkDoneToDo } from "@/utils/axiosQueries"
+import { updateToDo } from "@/utils/axiosQueries"
 import { OptionBox } from "./OptionBox"
 import Image from "next/image"
 import checked from "@/public/Vector.svg"
@@ -18,7 +18,7 @@ export const SingleTask:React.FC<SingleTaskProps> = (props) =>{
   const [optionBoxOpen, setOptionBoxOpen] = useState<boolean>(false)
   const [edit, setEdit] = useState<boolean>(false)
 
-  const {mutate:markDoneFn} = useMutation({ mutationFn: updateMarkDoneToDo,
+  const {mutate:updateToDoFn} = useMutation({ mutationFn: updateToDo,
     onSuccess: () => {
       queryClient.refetchQueries({ queryKey: ['todos'] })
     },
@@ -26,18 +26,25 @@ export const SingleTask:React.FC<SingleTaskProps> = (props) =>{
 
   const updateMarkDone = () =>{
     setSingleToDo({...singleToDo, completed: !singleToDo.completed})
-    markDoneFn({...todo, completed: !todo.completed})
+    updateToDoFn({...todo, completed: !todo.completed})
   }
+
+  const handleEditSave =  () => {
+    updateToDoFn({...todo, title : taskTitle})
+    setEdit(false)
+  }
+
   return (
     <section className="flex items-center justify-between  w-full h-[50px] bg-white rounded-full p-5">
       <div className="flex items-center gap-5 w-[90%]">
-        <button className={`flex justify-center items-center w-[22px] h-[22px] rounded-[6px] border-[2px] border-[#585292] ${singleToDo.completed && 'bg-[#585292]'}`} onClick={updateMarkDone}>
+        {!edit && <button className={`flex justify-center items-center w-[22px] h-[22px] rounded-[6px] border-[2px] border-[#585292] ${singleToDo.completed && 'bg-[#585292]'}`} onClick={updateMarkDone}>
           {singleToDo.completed && <Image src={checked} alt="Checked Icon" className="w-[10px] h-[8px]"></Image>}
-        </button>
-        <input type='text' value={taskTitle} className="text-[16px] w-full" onChange={(e)=>setTaskTitle(e.target.value)}/>
+        </button>}
+        <input disabled={!edit} type='text' value={taskTitle} className="text-[16px] w-full bg-inherit" onKeyDown={(e)=> e.key === 'Enter' && handleEditSave()} onChange={(e)=>setTaskTitle(e.target.value)}/>
       </div>
       <div className="relative w-[10%]">
-        <button className="text-[16px]" onClick={()=>setOptionBoxOpen(!optionBoxOpen)}>⋯</button>
+        {!edit && <button className="text-[16px]" onClick={()=>setOptionBoxOpen(!optionBoxOpen)}>⋯</button>}
+        {edit &&  <button className="w-[64px] h-[36px] rounded-full text-[16px] text-white bg-[#585292] " onClick={handleEditSave}>Save</button>}
         {optionBoxOpen && <OptionBox setEdit={setEdit} setOptionBoxOpen={setOptionBoxOpen} id={todo.id}/>}
       </div>
     </section>
