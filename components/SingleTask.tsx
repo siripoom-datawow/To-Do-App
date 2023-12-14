@@ -40,7 +40,7 @@ export const SingleTask:React.FC<SingleTaskProps> = (props) =>{
         {!edit && <button className={`flex justify-center items-center w-[22px] h-[22px] rounded-[6px] border-[2px] border-[#585292] ${singleToDo.completed && 'bg-[#585292]'}`} onClick={updateMarkDone}>
           {singleToDo.completed && <Image src={checked} alt="Checked Icon" className="w-[10px] h-[8px]"></Image>}
         </button>}
-        <input disabled={!edit} type='text' value={taskTitle} className="text-[16px] w-full bg-inherit" onKeyDown={(e)=> e.key === 'Enter' && handleEditSave()} onChange={(e)=>setTaskTitle(e.target.value)}/>
+        <input disabled={!edit} type='text' value={taskTitle} className={`text-[16px] w-full bg-inherit ${singleToDo.completed && 'line-through text-gray-300'} transition-all duration-300`} onKeyDown={(e)=> e.key === 'Enter' && handleEditSave()} onChange={(e)=>setTaskTitle(e.target.value)}/>
       </div>
       <div className="relative w-[10%]">
         {!edit && <button className="text-[16px]" onClick={()=>setOptionBoxOpen(!optionBoxOpen)}>⋯</button>}
